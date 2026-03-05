@@ -28,7 +28,6 @@ export default function HomePage() {
         textAlign: 'center',
         overflow: 'hidden',
       }}>
-        {/* Background video */}
         <video
           autoPlay
           muted
@@ -44,7 +43,6 @@ export default function HomePage() {
         >
           <source src="/portsmouth-aerial.mp4" type="video/mp4" />
         </video>
-        {/* Dark overlay so text stays readable */}
         <div style={{
           position: 'absolute',
           top: 0, left: 0,

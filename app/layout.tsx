@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Nav from "@/components/nav";
 import Footer from "@/components/footer";
-import Script from "next/script";
 
 export const metadata: Metadata = {
   title: "Bernards Estate Agents | Portsmouth",
@@ -20,16 +19,6 @@ export default function RootLayout({
         <Nav />
         {children}
         <Footer />
-              {/* Cold Lava Demo Tracking */}
-        <meta name="cl-job" content="BERNARDS-001" />
-        <Script id="cl-tracking" strategy="afterInteractive">
-          {`(function(){
-            var job = document.querySelector('meta[name="cl-job"]');
-            var jobNum = job ? job.content : window.location.hostname.split('.')[0];
-            var img = new Image();
-            img.src = 'https://track.coldlava.ai/pixel/' + encodeURIComponent(jobNum) + '?t=' + Date.now() + '&r=' + encodeURIComponent(document.referrer);
-          })();`}
-        </Script>
       </body>
     </html>
   );

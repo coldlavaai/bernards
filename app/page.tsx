@@ -1,407 +1,366 @@
 'use client'
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import Link from "next/link"
-import { Search, Home, Key, Building2, Phone, Mail, MapPin, Star } from "lucide-react"
-import { motion } from "framer-motion"
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { Search, Bed, Bath, Ruler } from 'lucide-react'
+import { mockProperties } from '@/lib/mockProperties'
+
+const featured = mockProperties.slice(0, 4)
 
 export default function HomePage() {
   const router = useRouter()
-  const [postcode, setPostcode] = useState('')
+  const [tab, setTab] = useState<'buy' | 'rent' | 'sold'>('buy')
+  const [location, setLocation] = useState('')
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
-    if (postcode.trim()) {
-      router.push(`/search?postcode=${encodeURIComponent(postcode.trim())}`)
-    }
+    const type = tab === 'buy' ? 'For Sale' : tab === 'rent' ? 'To Rent' : 'Sold'
+    router.push(`/search?type=${encodeURIComponent(type)}&location=${encodeURIComponent(location)}`)
   }
-
-  const fadeIn = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
-  }
-
-  const featuredProperties = [
-    {
-      id: 1,
-      type: 'For Sale',
-      price: '£425,000',
-      address: '23 Marina View, Gunwharf Quays, Portsmouth',
-      beds: 2,
-      baths: 2,
-      sqft: 982,
-      image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=80',
-      status: 'New Listing'
-    },
-    {
-      id: 2,
-      type: 'For Sale',
-      price: '£675,000',
-      address: '14 Southsea Terrace, Southsea, Portsmouth',
-      beds: 4,
-      baths: 3,
-      sqft: 1850,
-      image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80',
-      status: ''
-    },
-    {
-      id: 3,
-      type: 'To Rent',
-      price: '£1,450 pcm',
-      address: '8 Park Lane, Fareham, Hampshire',
-      beds: 3,
-      baths: 2,
-      sqft: 1240,
-      image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80',
-      status: ''
-    },
-    {
-      id: 4,
-      type: 'For Sale',
-      price: '£895,000',
-      address: '42 Coastal Road, Lee-on-the-Solent',
-      beds: 5,
-      baths: 3,
-      sqft: 2450,
-      image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&q=80',
-      status: 'Price Reduced'
-    }
-  ]
 
   return (
-    <main className="min-h-screen bg-white">
-      {/* Header/Navigation */}
-      <header className="border-b border-gray-200 bg-white sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            <Link href="/" className="flex items-center">
-              <div className="text-2xl font-bold text-gray-900">
-                BERNARDS
-              </div>
-            </Link>
-            <nav className="hidden md:flex items-center space-x-8">
-              <Link href="/search" className="text-sm font-medium text-gray-700 hover:text-gray-900">
-                Property Search
-              </Link>
-              <Link href="/selling" className="text-sm font-medium text-gray-700 hover:text-gray-900">
-                Selling
-              </Link>
-              <Link href="/landlords" className="text-sm font-medium text-gray-700 hover:text-gray-900">
-                Landlords
-              </Link>
-              <Link href="/about" className="text-sm font-medium text-gray-700 hover:text-gray-900">
-                About Us
-              </Link>
-              <Link href="/contact" className="text-sm font-medium text-gray-700 hover:text-gray-900">
-                Contact
-              </Link>
-              <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
-                Book Valuation
-              </Button>
-            </nav>
-          </div>
-        </div>
-      </header>
+    <main>
+      {/* ── HERO ── */}
+      <section style={{
+        background: 'linear-gradient(135deg, #0B2447 0%, #1B2A4A 60%, #0d2d5c 100%)',
+        padding: '80px 24px 100px',
+        textAlign: 'center',
+      }}>
+        <div style={{ maxWidth: 800, margin: '0 auto' }}>
+          <h1 style={{
+            fontFamily: 'Montserrat, sans-serif',
+            fontSize: 'clamp(28px, 5vw, 52px)',
+            fontWeight: 800,
+            color: '#fff',
+            lineHeight: 1.15,
+            marginBottom: 12,
+          }}>
+            Find Your Perfect Property<br />in Portsmouth &amp; Hampshire
+          </h1>
+          <p style={{
+            fontFamily: 'Montserrat, sans-serif',
+            fontSize: 16,
+            color: 'rgba(255,255,255,0.75)',
+            marginBottom: 40,
+            fontWeight: 500,
+          }}>
+            Expert estate agents serving Portsmouth, Southsea, Fareham, Gosport and surrounding areas since 1990
+          </p>
 
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-blue-50 to-white py-24 lg:py-32">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={fadeIn}
-            transition={{ duration: 0.6 }}
-            className="text-center max-w-3xl mx-auto mb-12"
-          >
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
-              Find Your Perfect Home in Portsmouth & Hampshire
-            </h1>
-            <p className="text-lg md:text-xl text-gray-600 mb-10">
-              Expert estate agents serving Portsmouth, Southsea, Fareham, Gosport and surrounding areas since 1990
-            </p>
-
-            {/* Search Form */}
-            <form onSubmit={handleSearch} className="max-w-2xl mx-auto">
-              <div className="flex flex-col sm:flex-row gap-3 p-4 bg-white rounded-lg shadow-lg">
-                <div className="flex-1">
-                  <Input
-                    type="text"
-                    placeholder="Enter postcode or location (e.g., PO6 1LZ, Portsmouth)"
-                    value={postcode}
-                    onChange={(e) => setPostcode(e.target.value)}
-                    className="h-12 text-base"
-                  />
-                </div>
-                <Button type="submit" size="lg" className="bg-blue-600 hover:bg-blue-700 h-12 px-8">
-                  <Search className="w-5 h-5 mr-2" />
-                  Search Properties
-                </Button>
-              </div>
-            </form>
-          </motion.div>
-
-          {/* Quick Stats */}
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={fadeIn}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto mt-16"
-          >
-            <div className="text-center">
-              <div className="text-4xl font-bold text-blue-600 mb-2">4,000+</div>
-              <div className="text-gray-600">Properties Sold</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-blue-600 mb-2">£235m</div>
-              <div className="text-gray-600">Total Sales Value</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-blue-600 mb-2">54</div>
-              <div className="text-gray-600">Dedicated Team Members</div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Featured Properties */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Featured Properties
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Browse our hand-picked selection of the finest homes available in Portsmouth and Hampshire
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredProperties.map((property, index) => (
-              <motion.div
-                key={property.id}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={fadeIn}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+          {/* Tabs */}
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 0, marginBottom: 0 }}>
+            {(['buy', 'rent', 'sold'] as const).map((t) => (
+              <button
+                key={t}
+                onClick={() => setTab(t)}
+                style={{
+                  fontFamily: 'Montserrat, sans-serif',
+                  fontSize: 13,
+                  fontWeight: 700,
+                  padding: '12px 28px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  borderRadius: t === 'buy' ? '8px 0 0 0' : t === 'sold' ? '0 8px 0 0' : '0',
+                  background: tab === t ? '#fff' : 'rgba(255,255,255,0.12)',
+                  color: tab === t ? '#0B2447' : 'rgba(255,255,255,0.85)',
+                  transition: 'all 0.15s',
+                  textTransform: 'capitalize',
+                  letterSpacing: 0.5,
+                }}
               >
-                <Card className="overflow-hidden hover:shadow-xl transition-shadow cursor-pointer group">
-                  <div className="relative h-56 overflow-hidden">
-                    <img
-                      src={property.image}
-                      alt={property.address}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                    {property.status && (
-                      <Badge className="absolute top-3 left-3 bg-blue-600">
-                        {property.status}
-                      </Badge>
-                    )}
-                    <Badge className="absolute top-3 right-3 bg-white text-gray-900">
-                      {property.type}
-                    </Badge>
-                  </div>
-                  <CardContent className="p-5">
-                    <div className="text-2xl font-bold text-gray-900 mb-3">
-                      {property.price}
-                    </div>
-                    <div className="text-gray-700 font-medium mb-4 line-clamp-2">
-                      {property.address}
-                    </div>
-                    <div className="flex items-center gap-4 text-sm text-gray-600">
-                      <div className="flex items-center gap-1">
-                        <Home className="w-4 h-4" />
-                        {property.beds} beds
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <div className="w-4 h-4">🚿</div>
-                        {property.baths} baths
-                      </div>
-                      <div>{property.sqft} sqft</div>
-                    </div>
-                    <Button variant="outline" className="w-full mt-4">
-                      View Details
-                    </Button>
-                  </CardContent>
-                </Card>
-              </motion.div>
+                {t === 'buy' ? 'Buy' : t === 'rent' ? 'Rent' : 'Sold'}
+              </button>
             ))}
           </div>
 
-          <div className="text-center mt-10">
-            <Link href="/search">
-              <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
-                View All Properties
-              </Button>
+          {/* Search form */}
+          <form onSubmit={handleSearch} style={{
+            display: 'flex',
+            background: '#fff',
+            borderRadius: '0 8px 8px 8px',
+            overflow: 'hidden',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.25)',
+          }}>
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', padding: '0 16px' }}>
+              <Search size={18} style={{ color: '#9ca3af', flexShrink: 0, marginRight: 10 }} />
+              <input
+                type="text"
+                placeholder="Enter a location or postcode (e.g. Portsmouth, PO1)"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                style={{
+                  flex: 1,
+                  border: 'none',
+                  outline: 'none',
+                  fontFamily: 'Montserrat, sans-serif',
+                  fontSize: 14,
+                  fontWeight: 500,
+                  color: '#1f2937',
+                  background: 'transparent',
+                  padding: '18px 0',
+                }}
+              />
+            </div>
+            <button
+              type="submit"
+              style={{
+                background: '#5D3384',
+                color: '#fff',
+                border: 'none',
+                cursor: 'pointer',
+                fontFamily: 'Montserrat, sans-serif',
+                fontSize: 14,
+                fontWeight: 700,
+                padding: '0 32px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                flexShrink: 0,
+              }}
+            >
+              <Search size={16} />
+              Search
+            </button>
+          </form>
+        </div>
+      </section>
+
+      {/* ── STATS STRIP ── */}
+      <section style={{ background: '#00DEB6', padding: '32px 24px' }}>
+        <div style={{
+          maxWidth: 1000,
+          margin: '0 auto',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+          gap: 24,
+          textAlign: 'center',
+        }}>
+          {[
+            { value: '4,000+', label: 'Properties Sold' },
+            { value: '£235m', label: 'Total Sales Value' },
+            { value: '30+', label: 'Years Experience' },
+            { value: '8', label: 'Local Offices' },
+          ].map((s) => (
+            <div key={s.label}>
+              <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 28, fontWeight: 800, color: '#0B2447' }}>{s.value}</div>
+              <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 13, fontWeight: 600, color: '#0B2447', opacity: 0.8 }}>{s.label}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── RECENT INSTRUCTIONS ── */}
+      <section style={{ background: '#f4f5f7', padding: '64px 24px' }}>
+        <div style={{ maxWidth: 1320, margin: '0 auto' }}>
+          <h2 style={{
+            fontFamily: 'Montserrat, sans-serif',
+            fontSize: 28,
+            fontWeight: 800,
+            color: '#0B2447',
+            marginBottom: 8,
+            textAlign: 'center',
+          }}>Recent Instructions</h2>
+          <p style={{
+            fontFamily: 'Montserrat, sans-serif',
+            fontSize: 14,
+            color: '#6b7280',
+            textAlign: 'center',
+            marginBottom: 40,
+            fontWeight: 500,
+          }}>
+            Browse our latest properties across Portsmouth and Hampshire
+          </p>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: 24,
+          }}>
+            {featured.map((p) => (
+              <Link key={p.id} href={`/property/${p.id}`} style={{ textDecoration: 'none' }}>
+                <div style={{
+                  background: '#fff',
+                  borderRadius: 12,
+                  overflow: 'hidden',
+                  boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+                  transition: 'transform 0.2s, box-shadow 0.2s',
+                }}
+                  onMouseEnter={e => {
+                    (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-4px)'
+                    ;(e.currentTarget as HTMLDivElement).style.boxShadow = '0 8px 32px rgba(0,0,0,0.15)'
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)'
+                    ;(e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 12px rgba(0,0,0,0.08)'
+                  }}
+                >
+                  <div style={{ position: 'relative', height: 200, overflow: 'hidden' }}>
+                    <img
+                      src={p.image}
+                      alt={p.address}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                    <div style={{
+                      position: 'absolute',
+                      top: 12,
+                      left: 12,
+                      background: p.type === 'For Sale' ? '#00DEB6' : '#5D3384',
+                      color: p.type === 'For Sale' ? '#0B2447' : '#fff',
+                      fontFamily: 'Montserrat, sans-serif',
+                      fontSize: 11,
+                      fontWeight: 700,
+                      padding: '4px 10px',
+                      borderRadius: 4,
+                      textTransform: 'uppercase',
+                      letterSpacing: 0.5,
+                    }}>
+                      {p.type}
+                    </div>
+                  </div>
+
+                  <div style={{ padding: '20px 20px 24px' }}>
+                    <div style={{
+                      fontFamily: 'Montserrat, sans-serif',
+                      fontSize: 22,
+                      fontWeight: 800,
+                      color: '#0B2447',
+                      marginBottom: 6,
+                    }}>{p.price}</div>
+                    <div style={{
+                      fontFamily: 'Montserrat, sans-serif',
+                      fontSize: 13,
+                      fontWeight: 600,
+                      color: '#374151',
+                      marginBottom: 14,
+                      lineHeight: 1.4,
+                    }}>{p.address}</div>
+                    <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'Montserrat, sans-serif', fontSize: 12, color: '#6b7280', fontWeight: 600 }}>
+                        <Bed size={14} style={{ color: '#00DEB6' }} />
+                        {p.beds} bed
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'Montserrat, sans-serif', fontSize: 12, color: '#6b7280', fontWeight: 600 }}>
+                        <Bath size={14} style={{ color: '#00DEB6' }} />
+                        {p.baths} bath
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'Montserrat, sans-serif', fontSize: 12, color: '#6b7280', fontWeight: 600 }}>
+                        <Ruler size={14} style={{ color: '#00DEB6' }} />
+                        {p.sqft} sqft
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          <div style={{ textAlign: 'center', marginTop: 40 }}>
+            <Link href="/search" style={{
+              display: 'inline-block',
+              background: '#5D3384',
+              color: '#fff',
+              fontFamily: 'Montserrat, sans-serif',
+              fontSize: 14,
+              fontWeight: 700,
+              padding: '14px 36px',
+              borderRadius: 8,
+              textDecoration: 'none',
+            }}>
+              View All Properties
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Why Choose Bernards */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Why Choose Bernards?
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              We're not just estate agents, we're your local property experts
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={fadeIn}
-              transition={{ duration: 0.5 }}
-              className="bg-white p-8 rounded-lg shadow-sm"
-            >
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
-                <Home className="w-6 h-6 text-blue-600" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">
-                Local Expertise
-              </h3>
-              <p className="text-gray-600">
-                Over 30 years of experience in Portsmouth and Hampshire. We know the market inside out.
-              </p>
-            </motion.div>
-
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={fadeIn}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="bg-white p-8 rounded-lg shadow-sm"
-            >
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
-                <Star className="w-6 h-6 text-blue-600" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">
-                Award Winning Service
-              </h3>
-              <p className="text-gray-600">
-                Consistently rated 5 stars by our customers. Your satisfaction is our top priority.
-              </p>
-            </motion.div>
-
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={fadeIn}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="bg-white p-8 rounded-lg shadow-sm"
-            >
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
-                <Key className="w-6 h-6 text-blue-600" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">
-                End-to-End Support
-              </h3>
-              <p className="text-gray-600">
-                From valuation to completion, we're with you every step of the way.
-              </p>
-            </motion.div>
-          </div>
+      {/* ── THINKING OF SELLING? CTA ── */}
+      <section style={{
+        background: 'linear-gradient(135deg, #0B2447 0%, #1B2A4A 100%)',
+        padding: '80px 24px',
+        textAlign: 'center',
+      }}>
+        <div style={{ maxWidth: 700, margin: '0 auto' }}>
+          <h2 style={{
+            fontFamily: 'Montserrat, sans-serif',
+            fontSize: 'clamp(24px, 4vw, 40px)',
+            fontWeight: 800,
+            color: '#fff',
+            marginBottom: 16,
+            lineHeight: 1.2,
+          }}>Thinking of Selling?</h2>
+          <p style={{
+            fontFamily: 'Montserrat, sans-serif',
+            fontSize: 15,
+            color: 'rgba(255,255,255,0.75)',
+            marginBottom: 36,
+            fontWeight: 500,
+            lineHeight: 1.7,
+          }}>
+            Get a free, no-obligation valuation from our expert local team.
+            We've been helping people move in Portsmouth and Hampshire for over 30 years.
+          </p>
+          <Link href="/valuations" style={{
+            display: 'inline-block',
+            background: '#00DEB6',
+            color: '#0B2447',
+            fontFamily: 'Montserrat, sans-serif',
+            fontSize: 15,
+            fontWeight: 800,
+            padding: '16px 44px',
+            borderRadius: 8,
+            textDecoration: 'none',
+            letterSpacing: 0.5,
+          }}>
+            Book a Free Valuation
+          </Link>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-blue-600">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeIn}
-            transition={{ duration: 0.6 }}
-          >
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-              Ready to Find Your Dream Home?
-            </h2>
-            <p className="text-xl text-blue-100 mb-8">
-              Get a free valuation or start your property search today
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" variant="outline" className="bg-white text-blue-600 hover:bg-gray-50 border-0">
-                Book Free Valuation
-              </Button>
-              <Link href="/search">
-                <Button size="lg" variant="outline" className="bg-transparent text-white border-2 border-white hover:bg-white hover:text-blue-600">
-                  Search Properties
-                </Button>
-              </Link>
-            </div>
-          </motion.div>
+      {/* ── WHY BERNARDS ── */}
+      <section style={{ background: '#fff', padding: '64px 24px' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <h2 style={{
+            fontFamily: 'Montserrat, sans-serif',
+            fontSize: 28,
+            fontWeight: 800,
+            color: '#0B2447',
+            textAlign: 'center',
+            marginBottom: 48,
+          }}>Why Choose Bernards?</h2>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 32 }}>
+            {[
+              { icon: '🏡', title: 'Local Experts', desc: 'Over 30 years serving Portsmouth and Hampshire. We know every street, every postcode.' },
+              { icon: '⭐', title: '5-Star Service', desc: 'Consistently rated 5 stars by our customers. Your satisfaction is our top priority.' },
+              { icon: '📍', title: '8 Local Offices', desc: 'Branches across Portsmouth, Southsea, Fareham, Gosport, Waterlooville and more.' },
+              { icon: '🔑', title: 'End-to-End Support', desc: 'From valuation to completion, we\'re with you every step of the way.' },
+            ].map((item) => (
+              <div key={item.title} style={{
+                background: '#f4f5f7',
+                borderRadius: 12,
+                padding: '32px 28px',
+                borderTop: '4px solid #00DEB6',
+              }}>
+                <div style={{ fontSize: 36, marginBottom: 16 }}>{item.icon}</div>
+                <h3 style={{
+                  fontFamily: 'Montserrat, sans-serif',
+                  fontSize: 16,
+                  fontWeight: 800,
+                  color: '#0B2447',
+                  marginBottom: 10,
+                }}>{item.title}</h3>
+                <p style={{
+                  fontFamily: 'Montserrat, sans-serif',
+                  fontSize: 13,
+                  color: '#6b7280',
+                  lineHeight: 1.7,
+                  fontWeight: 500,
+                }}>{item.desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-gray-300 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <div className="text-2xl font-bold text-white mb-4">BERNARDS</div>
-              <p className="text-sm mb-4">
-                Your trusted estate agent in Portsmouth, Southsea, Fareham and Gosport since 1990
-              </p>
-            </div>
-
-            <div>
-              <h4 className="text-white font-semibold mb-4">Quick Links</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="/search" className="hover:text-white">Property Search</Link></li>
-                <li><Link href="/selling" className="hover:text-white">Selling</Link></li>
-                <li><Link href="/landlords" className="hover:text-white">Landlords</Link></li>
-                <li><Link href="/about" className="hover:text-white">About Us</Link></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-white font-semibold mb-4">Services</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="/sales" className="hover:text-white">Sales</Link></li>
-                <li><Link href="/lettings" className="hover:text-white">Lettings</Link></li>
-                <li><Link href="/mortgages" className="hover:text-white">Mortgages</Link></li>
-                <li><Link href="/valuations" className="hover:text-white">Valuations</Link></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-white font-semibold mb-4">Contact</h4>
-              <ul className="space-y-3 text-sm">
-                <li className="flex items-center gap-2">
-                  <Phone className="w-4 h-4" />
-                  023 9200 8575
-                </li>
-                <li className="flex items-center gap-2">
-                  <Mail className="w-4 h-4" />
-                  info@bernards.co.uk
-                </li>
-                <li className="flex items-start gap-2">
-                  <MapPin className="w-4 h-4 mt-0.5" />
-                  <span>123 High Street<br />Portsmouth, PO1 2EF</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="border-t border-gray-800 pt-8 text-sm text-center">
-            <p>© 2026 Bernards Estate Agents. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
     </main>
   )
 }

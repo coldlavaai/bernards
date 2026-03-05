@@ -49,6 +49,16 @@
 }
 
 :root {
+  --b-teal: #00DEB6;
+  --b-teal-dark: #00b894;
+  --b-navy: #0B2447;
+  --b-navy-light: #1B2A4A;
+  --b-purple: #5D3384;
+  --b-dark: #2B2B2B;
+  --b-gray: #6b7280;
+  --b-light: #f4f5f7;
+  --b-border: #e5e7eb;
+  --b-text: #1f2937;
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);

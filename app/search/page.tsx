@@ -1,345 +1,345 @@
 'use client'
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Select } from "@/components/ui/select"
-import Link from "next/link"
-import { Search, SlidersHorizontal, Heart, Phone, Mail, MapPin, Home, ChevronLeft, ChevronRight } from "lucide-react"
-import { useState, useMemo, Suspense } from "react"
-import { useSearchParams } from "next/navigation"
-import { mockProperties, type Property } from "@/lib/mockProperties"
+import { useState, useMemo, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
+import Link from 'next/link'
+import { Search, Heart, Bed, Bath, Maximize2 } from 'lucide-react'
+import { mockProperties } from '@/lib/mockProperties'
+import dynamic from 'next/dynamic'
+
+const PropertyMap = dynamic(() => import('@/components/property-map'), { ssr: false })
 
 function SearchContent() {
   const searchParams = useSearchParams()
-  const initialPostcode = searchParams.get('postcode') || 'PO6 1LZ'
+  const initialLocation = searchParams.get('location') || ''
+  const initialType = searchParams.get('type') || ''
 
-  const [searchLocation, setSearchLocation] = useState(initialPostcode)
-  const [radius, setRadius] = useState('3')
+  const [searchLocation, setSearchLocation] = useState(initialLocation)
   const [minPrice, setMinPrice] = useState('')
   const [maxPrice, setMaxPrice] = useState('')
   const [minBeds, setMinBeds] = useState('')
   const [propertyType, setPropertyType] = useState('')
   const [sortBy, setSortBy] = useState('newest')
   const [savedProperties, setSavedProperties] = useState<number[]>([])
-  const [listingType, setListingType] = useState<'sale' | 'rent'>('sale')
+  const [listingType, setListingType] = useState<'For Sale' | 'To Rent'>(
+    initialType === 'To Rent' ? 'To Rent' : 'For Sale'
+  )
 
-  // Filter and sort properties
   const filteredProperties = useMemo(() => {
     let filtered = mockProperties.filter(p => {
-      // Filter by listing type
-      if (listingType === 'sale' && p.type !== 'For Sale') return false
-      if (listingType === 'rent' && p.type !== 'To Rent') return false
-
-      // Filter by price
+      if (p.type !== listingType) return false
       if (minPrice && p.priceValue < parseInt(minPrice)) return false
       if (maxPrice && p.priceValue > parseInt(maxPrice)) return false
-
-      // Filter by bedrooms
       if (minBeds && p.beds < parseInt(minBeds)) return false
-
-      // Filter by property type
       if (propertyType && p.propertyType !== propertyType) return false
-
       return true
     })
 
-    // Sort
-    switch (sortBy) {
-      case 'newest':
-        return filtered
-      case 'price-low':
-        return [...filtered].sort((a, b) => a.priceValue - b.priceValue)
-      case 'price-high':
-        return [...filtered].sort((a, b) => b.priceValue - a.priceValue)
-      default:
-        return filtered
-    }
+    if (sortBy === 'price-low') return [...filtered].sort((a, b) => a.priceValue - b.priceValue)
+    if (sortBy === 'price-high') return [...filtered].sort((a, b) => b.priceValue - a.priceValue)
+    return filtered
   }, [minPrice, maxPrice, minBeds, propertyType, sortBy, listingType])
 
   const toggleSaved = (id: number) => {
-    setSavedProperties(prev =>
-      prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]
-    )
+    setSavedProperties(prev => prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id])
+  }
+
+  const selectStyle: React.CSSProperties = {
+    height: 42,
+    padding: '0 12px',
+    border: '1px solid rgba(255,255,255,0.2)',
+    borderRadius: 6,
+    fontSize: 13,
+    fontFamily: 'Montserrat, sans-serif',
+    fontWeight: 600,
+    background: 'rgba(255,255,255,0.1)',
+    color: '#fff',
+    cursor: 'pointer',
+    outline: 'none',
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Header */}
-      <header className="border-b border-gray-200 bg-white sticky top-0 z-50">
-        <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <Link href="/" className="flex items-center">
-              <div className="text-xl font-bold text-gray-900">BERNARDS</div>
-            </Link>
-            <nav className="hidden md:flex items-center space-x-6">
-              <Link href="/" className="text-sm text-gray-600 hover:text-gray-900">Home</Link>
-              <Link href="/selling" className="text-sm text-gray-600 hover:text-gray-900">Selling</Link>
-              <Link href="/contact" className="text-sm text-gray-600 hover:text-gray-900">Contact</Link>
-            </nav>
-          </div>
-        </div>
-      </header>
-
-      {/* Filters Bar */}
-      <div className="bg-white border-b border-gray-200 sticky top-16 z-40">
-        <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          {/* Buy/Rent Toggle */}
-          <div className="flex items-center gap-2 mb-4">
-            <Button
-              variant={listingType === 'sale' ? 'default' : 'outline'}
-              onClick={() => setListingType('sale')}
-              className={listingType === 'sale' ? 'bg-green-600 hover:bg-green-700' : ''}
-            >
-              For Sale
-            </Button>
-            <Button
-              variant={listingType === 'rent' ? 'default' : 'outline'}
-              onClick={() => setListingType('rent')}
-              className={listingType === 'rent' ? 'bg-green-600 hover:bg-green-700' : ''}
-            >
-              To Rent
-            </Button>
+    <div style={{ minHeight: '100vh', background: '#f4f5f7' }}>
+      {/* Dark Filter Bar */}
+      <div style={{ background: '#2B2B2B', padding: '16px 24px', position: 'sticky', top: 72, zIndex: 40 }}>
+        <div style={{ maxWidth: 1600, margin: '0 auto' }}>
+          {/* Buy / Rent tabs */}
+          <div style={{ display: 'flex', gap: 0, marginBottom: 14 }}>
+            {(['For Sale', 'To Rent'] as const).map((t) => (
+              <button
+                key={t}
+                onClick={() => setListingType(t)}
+                style={{
+                  fontFamily: 'Montserrat, sans-serif',
+                  fontSize: 12,
+                  fontWeight: 700,
+                  padding: '8px 20px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  background: listingType === t ? '#00DEB6' : 'rgba(255,255,255,0.1)',
+                  color: listingType === t ? '#0B2447' : 'rgba(255,255,255,0.7)',
+                  borderRadius: t === 'For Sale' ? '6px 0 0 6px' : '0 6px 6px 0',
+                  transition: 'all 0.15s',
+                  letterSpacing: 0.3,
+                }}
+              >
+                {t}
+              </button>
+            ))}
           </div>
 
-          {/* Search Filters */}
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="flex-1 min-w-[250px]">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <Input
-                  type="text"
-                  value={searchLocation}
-                  onChange={(e) => setSearchLocation(e.target.value)}
-                  placeholder="Search location or postcode"
-                  className="pl-10 h-10"
-                />
-              </div>
+          {/* Filters row */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center' }}>
+            {/* Location search */}
+            <div style={{ flex: '1 1 260px', display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,0.1)', borderRadius: 6, border: '1px solid rgba(255,255,255,0.2)', padding: '0 12px', height: 42 }}>
+              <Search size={16} style={{ color: 'rgba(255,255,255,0.5)', flexShrink: 0, marginRight: 8 }} />
+              <input
+                type="text"
+                value={searchLocation}
+                onChange={(e) => setSearchLocation(e.target.value)}
+                placeholder="Location or postcode"
+                style={{
+                  flex: 1,
+                  border: 'none',
+                  outline: 'none',
+                  background: 'transparent',
+                  fontFamily: 'Montserrat, sans-serif',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: '#fff',
+                }}
+              />
             </div>
 
-            <select
-              value={radius}
-              onChange={(e) => setRadius(e.target.value)}
-              className="h-10 px-3 border border-gray-300 rounded-md text-sm bg-white"
-            >
-              <option value="0">This area only</option>
-              <option value="0.25">+ 0.25 miles</option>
-              <option value="0.5">+ 0.5 miles</option>
-              <option value="1">+ 1 mile</option>
-              <option value="3">+ 3 miles</option>
-              <option value="5">+ 5 miles</option>
-              <option value="10">+ 10 miles</option>
+            <select style={selectStyle} value={minPrice} onChange={(e) => setMinPrice(e.target.value)}>
+              <option value="" style={{ background: '#2B2B2B' }}>Min Price</option>
+              <option value="100000" style={{ background: '#2B2B2B' }}>£100,000</option>
+              <option value="200000" style={{ background: '#2B2B2B' }}>£200,000</option>
+              <option value="300000" style={{ background: '#2B2B2B' }}>£300,000</option>
+              <option value="400000" style={{ background: '#2B2B2B' }}>£400,000</option>
+              <option value="500000" style={{ background: '#2B2B2B' }}>£500,000</option>
+              <option value="600000" style={{ background: '#2B2B2B' }}>£600,000</option>
             </select>
 
-            <select
-              value={minPrice}
-              onChange={(e) => setMinPrice(e.target.value)}
-              className="h-10 px-3 border border-gray-300 rounded-md text-sm bg-white"
-            >
-              <option value="">Min price</option>
-              <option value="200000">£200,000</option>
-              <option value="300000">£300,000</option>
-              <option value="400000">£400,000</option>
-              <option value="500000">£500,000</option>
-              <option value="600000">£600,000</option>
-              <option value="700000">£700,000</option>
+            <select style={selectStyle} value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)}>
+              <option value="" style={{ background: '#2B2B2B' }}>Max Price</option>
+              <option value="300000" style={{ background: '#2B2B2B' }}>£300,000</option>
+              <option value="400000" style={{ background: '#2B2B2B' }}>£400,000</option>
+              <option value="500000" style={{ background: '#2B2B2B' }}>£500,000</option>
+              <option value="600000" style={{ background: '#2B2B2B' }}>£600,000</option>
+              <option value="750000" style={{ background: '#2B2B2B' }}>£750,000</option>
+              <option value="1000000" style={{ background: '#2B2B2B' }}>£1,000,000</option>
             </select>
 
-            <select
-              value={maxPrice}
-              onChange={(e) => setMaxPrice(e.target.value)}
-              className="h-10 px-3 border border-gray-300 rounded-md text-sm bg-white"
-            >
-              <option value="">Max price</option>
-              <option value="400000">£400,000</option>
-              <option value="500000">£500,000</option>
-              <option value="600000">£600,000</option>
-              <option value="700000">£700,000</option>
-              <option value="800000">£800,000</option>
-              <option value="1000000">£1,000,000</option>
+            <select style={selectStyle} value={minBeds} onChange={(e) => setMinBeds(e.target.value)}>
+              <option value="" style={{ background: '#2B2B2B' }}>Beds</option>
+              <option value="1" style={{ background: '#2B2B2B' }}>1+</option>
+              <option value="2" style={{ background: '#2B2B2B' }}>2+</option>
+              <option value="3" style={{ background: '#2B2B2B' }}>3+</option>
+              <option value="4" style={{ background: '#2B2B2B' }}>4+</option>
+              <option value="5" style={{ background: '#2B2B2B' }}>5+</option>
             </select>
 
-            <select
-              value={minBeds}
-              onChange={(e) => setMinBeds(e.target.value)}
-              className="h-10 px-3 border border-gray-300 rounded-md text-sm bg-white"
-            >
-              <option value="">Beds</option>
-              <option value="1">1+</option>
-              <option value="2">2+</option>
-              <option value="3">3+</option>
-              <option value="4">4+</option>
-              <option value="5">5+</option>
+            <select style={selectStyle} value={propertyType} onChange={(e) => setPropertyType(e.target.value)}>
+              <option value="" style={{ background: '#2B2B2B' }}>Property Type</option>
+              <option value="Detached" style={{ background: '#2B2B2B' }}>Detached</option>
+              <option value="Semi-Detached" style={{ background: '#2B2B2B' }}>Semi-Detached</option>
+              <option value="Terraced" style={{ background: '#2B2B2B' }}>Terraced</option>
+              <option value="Flat" style={{ background: '#2B2B2B' }}>Flat</option>
+              <option value="Bungalow" style={{ background: '#2B2B2B' }}>Bungalow</option>
             </select>
 
-            <select
-              value={propertyType}
-              onChange={(e) => setPropertyType(e.target.value)}
-              className="h-10 px-3 border border-gray-300 rounded-md text-sm bg-white"
+            <button
+              style={{
+                background: '#5D3384',
+                color: '#fff',
+                border: 'none',
+                cursor: 'pointer',
+                fontFamily: 'Montserrat, sans-serif',
+                fontSize: 13,
+                fontWeight: 700,
+                padding: '0 24px',
+                height: 42,
+                borderRadius: 6,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+              }}
             >
-              <option value="">Property type</option>
-              <option value="House">House</option>
-              <option value="Flat">Flat</option>
-              <option value="Bungalow">Bungalow</option>
-              <option value="Detached">Detached</option>
-              <option value="Semi-Detached">Semi-Detached</option>
-              <option value="Terraced">Terraced</option>
-            </select>
+              <Search size={15} />
+              Search
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Main Content Area */}
-      <div className="max-w-[1920px] mx-auto">
-        <div className="flex">
-          {/* Left: Property Listings */}
-          <div className="flex-1 px-4 sm:px-6 lg:px-8 py-6">
-            {/* Results Header */}
-            <div className="flex items-center justify-between mb-6">
-              <h1 className="text-xl font-semibold text-gray-900">
-                {filteredProperties.length} properties {listingType === 'sale' ? 'for sale' : 'to rent'} in {searchLocation}
-              </h1>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="h-9 px-3 border border-gray-300 rounded-md text-sm bg-white"
-              >
-                <option value="newest">Newest listed</option>
-                <option value="price-low">Price (low to high)</option>
-                <option value="price-high">Price (high to low)</option>
-              </select>
-            </div>
+      {/* Main content */}
+      <div style={{ maxWidth: 1600, margin: '0 auto', display: 'flex', minHeight: 'calc(100vh - 180px)' }}>
+        {/* Left: Listings */}
+        <div style={{ flex: 1, padding: '24px', minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+            <h1 style={{
+              fontFamily: 'Montserrat, sans-serif',
+              fontSize: 18,
+              fontWeight: 700,
+              color: '#0B2447',
+            }}>
+              {filteredProperties.length} properties {listingType === 'For Sale' ? 'for sale' : 'to rent'}
+              {searchLocation ? ` in ${searchLocation}` : ''}
+            </h1>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              style={{
+                height: 38,
+                padding: '0 10px',
+                border: '1px solid #e5e7eb',
+                borderRadius: 6,
+                fontSize: 13,
+                fontFamily: 'Montserrat, sans-serif',
+                fontWeight: 600,
+                background: '#fff',
+                color: '#374151',
+                cursor: 'pointer',
+              }}
+            >
+              <option value="newest">Newest listed</option>
+              <option value="price-low">Price (low to high)</option>
+              <option value="price-high">Price (high to low)</option>
+            </select>
+          </div>
 
-            {/* Property Cards */}
-            <div className="space-y-4">
-              {filteredProperties.map((property) => (
-                <Card key={property.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                  <div className="flex flex-col md:flex-row">
-                    {/* Image */}
-                    <div className="relative md:w-72 h-56 flex-shrink-0">
-                      <img
-                        src={property.image}
-                        alt={property.address}
-                        className="w-full h-full object-cover"
-                      />
-                      <button
-                        onClick={() => toggleSaved(property.id)}
-                        className="absolute top-3 right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center hover:bg-gray-100"
-                      >
-                        <Heart
-                          className={`w-4 h-4 ${savedProperties.includes(property.id) ? 'fill-red-500 text-red-500' : 'text-gray-600'}`}
-                        />
-                      </button>
-                      <div className="absolute bottom-3 left-3">
-                        <Badge className="bg-white text-gray-900 text-xs">
-                          {property.images.length} photos
-                        </Badge>
-                      </div>
-                    </div>
-
-                    {/* Content */}
-                    <div className="flex-1 p-5">
-                      <div className="flex items-start justify-between mb-3">
-                        <div>
-                          <div className="text-2xl font-bold text-gray-900 mb-1">
-                            {property.price}
-                          </div>
-                          <div className="text-gray-700 font-medium mb-2">
-                            {property.address}
-                          </div>
-                          <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
-                            <div className="flex items-center gap-1">
-                              <Home className="w-4 h-4" />
-                              {property.beds} bed
-                            </div>
-                            <div>• {property.baths} bath</div>
-                            <div>• {property.propertyType}</div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-                        {property.description}
-                      </p>
-
-                      <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                        <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
-                            <span className="text-white text-xs font-bold">B</span>
-                          </div>
-                          <div className="text-xs text-gray-600">
-                            <div className="font-medium text-gray-900">{property.agent}</div>
-                            <div>Added on {property.addedOn}</div>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          <Button size="sm" variant="outline" className="text-sm">
-                            <Phone className="w-3 h-3 mr-1" />
-                            Call
-                          </Button>
-                          <Button size="sm" variant="outline" className="text-sm">
-                            <Mail className="w-3 h-3 mr-1" />
-                            Email
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
+          {/* Property cards */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {filteredProperties.map((p) => (
+              <div key={p.id} style={{
+                background: '#fff',
+                borderRadius: 10,
+                overflow: 'hidden',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.07)',
+                display: 'flex',
+                flexDirection: 'row',
+              }}>
+                {/* Image */}
+                <div style={{ position: 'relative', width: 280, flexShrink: 0 }}>
+                  <img
+                    src={p.image}
+                    alt={p.address}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  />
+                  <div style={{
+                    position: 'absolute',
+                    top: 10,
+                    left: 10,
+                    background: p.type === 'For Sale' ? '#00DEB6' : '#5D3384',
+                    color: p.type === 'For Sale' ? '#0B2447' : '#fff',
+                    fontFamily: 'Montserrat, sans-serif',
+                    fontSize: 10,
+                    fontWeight: 700,
+                    padding: '3px 8px',
+                    borderRadius: 3,
+                    textTransform: 'uppercase',
+                  }}>
+                    {p.type}
                   </div>
-                </Card>
-              ))}
-            </div>
-
-            {/* No Results */}
-            {filteredProperties.length === 0 && (
-              <div className="text-center py-16">
-                <div className="text-gray-400 mb-4">
-                  <Home className="w-16 h-16 mx-auto" />
+                  <button
+                    onClick={() => toggleSaved(p.id)}
+                    style={{
+                      position: 'absolute',
+                      top: 10,
+                      right: 10,
+                      width: 32,
+                      height: 32,
+                      background: '#fff',
+                      border: 'none',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
+                    }}
+                  >
+                    <Heart
+                      size={15}
+                      style={{
+                        fill: savedProperties.includes(p.id) ? '#ef4444' : 'none',
+                        color: savedProperties.includes(p.id) ? '#ef4444' : '#6b7280',
+                      }}
+                    />
+                  </button>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  No properties found
-                </h3>
-                <p className="text-gray-600">
-                  Try adjusting your filters to see more results
-                </p>
+
+                {/* Content */}
+                <div style={{ flex: 1, padding: '20px 24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                  <div>
+                    <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 24, fontWeight: 800, color: '#0B2447', marginBottom: 4 }}>
+                      {p.price}
+                    </div>
+                    <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 14, fontWeight: 600, color: '#374151', marginBottom: 10 }}>
+                      {p.address}
+                    </div>
+                    <div style={{ display: 'flex', gap: 20, alignItems: 'center', marginBottom: 12 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'Montserrat, sans-serif', fontSize: 12, color: '#6b7280', fontWeight: 600 }}>
+                        <Bed size={14} style={{ color: '#00DEB6' }} />{p.beds} bed
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'Montserrat, sans-serif', fontSize: 12, color: '#6b7280', fontWeight: 600 }}>
+                        <Bath size={14} style={{ color: '#00DEB6' }} />{p.baths} bath
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'Montserrat, sans-serif', fontSize: 12, color: '#6b7280', fontWeight: 600 }}>
+                        <Maximize2 size={14} style={{ color: '#00DEB6' }} />{p.sqft} sqft
+                      </div>
+                      <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 12, color: '#9ca3af', fontWeight: 600 }}>
+                        {p.propertyType}
+                      </div>
+                    </div>
+                    <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 13, color: '#6b7280', lineHeight: 1.6, fontWeight: 500, marginBottom: 16 }}>
+                      {p.description.substring(0, 140)}...
+                    </p>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 14, borderTop: '1px solid #f0f0f0' }}>
+                    <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 12, color: '#9ca3af', fontWeight: 500 }}>
+                      Added {p.addedOn}
+                    </div>
+                    <Link href={`/property/${p.id}`} style={{
+                      background: '#5D3384',
+                      color: '#fff',
+                      fontFamily: 'Montserrat, sans-serif',
+                      fontSize: 12,
+                      fontWeight: 700,
+                      padding: '8px 20px',
+                      borderRadius: 6,
+                      textDecoration: 'none',
+                    }}>
+                      View Property
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            {filteredProperties.length === 0 && (
+              <div style={{ textAlign: 'center', padding: '80px 0', color: '#9ca3af', fontFamily: 'Montserrat, sans-serif', fontWeight: 600 }}>
+                <div style={{ fontSize: 48, marginBottom: 16 }}>🏡</div>
+                <div style={{ fontSize: 18, color: '#374151', marginBottom: 8 }}>No properties found</div>
+                <div style={{ fontSize: 13 }}>Try adjusting your filters</div>
               </div>
             )}
           </div>
+        </div>
 
-          {/* Right: Map (sticky) */}
-          <div className="hidden lg:block w-[600px] flex-shrink-0">
-            <div className="sticky top-32 h-[calc(100vh-8rem)]">
-              <div className="relative w-full h-full bg-gray-100 flex items-center justify-center border-l border-gray-200">
-                {/* Placeholder map - in production this would be Google Maps or similar */}
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-green-50">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-center p-8">
-                      <MapPin className="w-16 h-16 text-blue-600 mx-auto mb-4" />
-                      <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                        Interactive Map
-                      </h3>
-                      <p className="text-gray-600 mb-4">
-                        Showing {filteredProperties.length} properties near {searchLocation}
-                      </p>
-                      <div className="space-y-2">
-                        {filteredProperties.slice(0, 5).map((property) => (
-                          <div
-                            key={property.id}
-                            className="inline-block bg-white px-3 py-1.5 rounded-full text-sm font-medium text-gray-900 shadow-sm mr-2"
-                          >
-                            📍 {property.price}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+        {/* Right: Map */}
+        <div style={{ width: 520, flexShrink: 0, position: 'sticky', top: 145, height: 'calc(100vh - 145px)', display: 'none' }} className="map-sidebar">
+          <PropertyMap properties={filteredProperties} />
         </div>
       </div>
+
+      <style>{`
+        @media (min-width: 1100px) {
+          .map-sidebar { display: block !important; }
+        }
+      `}</style>
     </div>
   )
 }
@@ -347,8 +347,8 @@ function SearchContent() {
 export default function SearchPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-gray-600">Loading...</div>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Montserrat, sans-serif', color: '#6b7280' }}>
+        Loading properties...
       </div>
     }>
       <SearchContent />

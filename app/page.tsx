@@ -42,7 +42,7 @@ export default function HomePage() {
             zIndex: 0,
           }}
         >
-          <source src="https://bernardsestateagents.live-website.com/wp-content/uploads/2026/02/portsmouth-aerial.mp4" type="video/mp4" />
+          <source src="/portsmouth-aerial.mp4" type="video/mp4" />
         </video>
         {/* Dark overlay so text stays readable */}
         <div style={{

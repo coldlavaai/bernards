@@ -23,11 +23,36 @@ export default function HomePage() {
     <main>
       {/* ── HERO ── */}
       <section style={{
-        background: 'linear-gradient(135deg, #0B2447 0%, #1B2A4A 60%, #0d2d5c 100%)',
+        position: 'relative',
         padding: '80px 24px 100px',
         textAlign: 'center',
+        overflow: 'hidden',
       }}>
-        <div style={{ maxWidth: 800, margin: '0 auto' }}>
+        {/* Background video */}
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          style={{
+            position: 'absolute',
+            top: 0, left: 0,
+            width: '100%', height: '100%',
+            objectFit: 'cover',
+            zIndex: 0,
+          }}
+        >
+          <source src="https://bernardsestateagents.live-website.com/wp-content/uploads/2026/02/portsmouth-aerial.mp4" type="video/mp4" />
+        </video>
+        {/* Dark overlay so text stays readable */}
+        <div style={{
+          position: 'absolute',
+          top: 0, left: 0,
+          width: '100%', height: '100%',
+          background: 'linear-gradient(135deg, rgba(11,36,71,0.82) 0%, rgba(27,42,74,0.78) 100%)',
+          zIndex: 1,
+        }} />
+        <div style={{ maxWidth: 800, margin: '0 auto', position: 'relative', zIndex: 2 }}>
           <h1 style={{
             fontFamily: 'Montserrat, sans-serif',
             fontSize: 'clamp(28px, 5vw, 52px)',
